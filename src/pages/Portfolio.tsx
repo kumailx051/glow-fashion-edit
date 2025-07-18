@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
@@ -18,7 +18,25 @@ export default function Portfolio() {
     show: false, 
     currentSrc: '' 
   });
+  const [editableContent, setEditableContent] = useState<Record<string, string>>({});
   const { toast } = useToast();
+
+  // Load saved content on mount
+  useEffect(() => {
+    const savedContent = localStorage.getItem('portfolio-content');
+    if (savedContent) {
+      const content = JSON.parse(savedContent);
+      setEditableContent(content);
+      
+      // Apply saved content to DOM elements
+      Object.entries(content).forEach(([id, text]) => {
+        const element = document.querySelector(`[data-content-id="${id}"]`) as HTMLElement;
+        if (element && text) {
+          element.textContent = text as string;
+        }
+      });
+    }
+  }, [location.pathname]); // Re-run when route changes
 
   const handleTextEdit = (element: HTMLElement) => {
     if (!isAdminMode) return;
@@ -37,6 +55,14 @@ export default function Portfolio() {
       element.contentEditable = 'false';
       element.removeEventListener('blur', handleSave);
       element.removeEventListener('keydown', handleKeyDown);
+      
+      // Save to localStorage
+      const contentId = element.getAttribute('data-content-id') || `content-${Date.now()}`;
+      element.setAttribute('data-content-id', contentId);
+      
+      const newContent = { ...editableContent, [contentId]: element.textContent || '' };
+      setEditableContent(newContent);
+      localStorage.setItem('portfolio-content', JSON.stringify(newContent));
       
       toast({
         title: "Text Updated",

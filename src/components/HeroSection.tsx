@@ -63,25 +63,27 @@ export default function HeroSection({ isAdminMode, onEditText, onEditImage }: He
           transition={{ duration: 1, delay: 0.2 }}
         >
           <motion.h1
-            className={`text-6xl md:text-8xl font-bold mb-6 glow-text bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent ${
+            className={`text-6xl md:text-8xl font-bold mb-6 glow-text text-foreground ${
               isAdminMode ? 'editable' : ''
             }`}
             whileHover={isAdminMode ? { scale: 1.02 } : {}}
             onDoubleClick={handleTextEdit}
             data-editable="true"
+            data-content-id="hero-title"
           >
-            Hi, I'm Arshma
+            Arshma Batool
           </motion.h1>
           
           <motion.h2
-            className={`text-4xl md:text-6xl font-bold mb-8 text-accent glow-text ${
+            className={`text-4xl md:text-6xl font-bold mb-8 text-primary glow-text ${
               isAdminMode ? 'editable' : ''
             }`}
             whileHover={isAdminMode ? { scale: 1.02 } : {}}
             onDoubleClick={handleTextEdit}
             data-editable="true"
+            data-content-id="hero-subtitle"
           >
-            Fashion Designer!
+            I am Fashion Designer
           </motion.h2>
         </motion.div>
 
@@ -95,6 +97,7 @@ export default function HeroSection({ isAdminMode, onEditText, onEditImage }: He
           whileHover={isAdminMode ? { scale: 1.01 } : {}}
           onDoubleClick={handleTextEdit}
           data-editable="true"
+          data-content-id="hero-description"
         >
           I am a visionary fashion designer creating innovative designs that blend contemporary style with timeless elegance. 
           My work spans from haute couture to ready-to-wear collections, each piece telling a unique story through fabric, 
