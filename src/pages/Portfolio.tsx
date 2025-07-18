@@ -19,11 +19,14 @@ export default function Portfolio() {
     currentSrc: '' 
   });
   const [editableContent, setEditableContent] = useState<Record<string, string>>({});
+  const [editableImages, setEditableImages] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   // Load saved content on mount
   useEffect(() => {
     const savedContent = localStorage.getItem('portfolio-content');
+    const savedImages = localStorage.getItem('portfolio-images');
+    
     if (savedContent) {
       const content = JSON.parse(savedContent);
       setEditableContent(content);
@@ -35,6 +38,11 @@ export default function Portfolio() {
           element.textContent = text as string;
         }
       });
+    }
+    
+    if (savedImages) {
+      const images = JSON.parse(savedImages);
+      setEditableImages(images);
     }
   }, [location.pathname]); // Re-run when route changes
 
@@ -90,12 +98,20 @@ export default function Portfolio() {
     setImageUploader({ show: true, currentSrc });
   };
 
-  const handleImageChange = (newImageUrl: string) => {
-    // In a real app, this would update the image in your content management system
+  const handleImageUpload = (file: File) => {
+    const url = URL.createObjectURL(file);
+    const imageId = imageUploader.currentSrc || `image-${Date.now()}`;
+    
+    // Save to localStorage
+    const newImages = { ...editableImages, [imageId]: url };
+    setEditableImages(newImages);
+    localStorage.setItem('portfolio-images', JSON.stringify(newImages));
+    
+    setImageUploader({ show: false, currentSrc: '' });
+    
     toast({
       title: "Image Updated",
-      description: "The image has been successfully changed.",
-      duration: 2000,
+      description: "Your image has been successfully updated.",
     });
   };
 
@@ -117,6 +133,8 @@ export default function Portfolio() {
           isAdminMode={isAdminMode} 
           onEditText={handleTextEdit}
           onEditImage={handleImageEdit}
+          savedContent={editableContent}
+          savedImages={editableImages}
         />
         
         {isAdminMode && (
@@ -194,7 +212,7 @@ export default function Portfolio() {
         {imageUploader.show && (
           <ImageUploader
             currentImage={imageUploader.currentSrc}
-            onImageChange={handleImageChange}
+            onImageUpload={handleImageUpload}
             onClose={() => setImageUploader({ show: false, currentSrc: '' })}
           />
         )}

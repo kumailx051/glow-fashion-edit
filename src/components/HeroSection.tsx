@@ -8,9 +8,11 @@ interface HeroSectionProps {
   isAdminMode?: boolean;
   onEditText?: (element: HTMLElement) => void;
   onEditImage?: (currentSrc: string) => void;
+  savedContent?: Record<string, string>;
+  savedImages?: Record<string, string>;
 }
 
-export default function HeroSection({ isAdminMode, onEditText, onEditImage }: HeroSectionProps) {
+export default function HeroSection({ isAdminMode, onEditText, onEditImage, savedContent, savedImages }: HeroSectionProps) {
   const isMobile = useIsMobile();
 
   const scrollToWork = () => {
@@ -32,16 +34,19 @@ export default function HeroSection({ isAdminMode, onEditText, onEditImage }: He
     if (isAdminMode && onEditImage) {
       e.preventDefault();
       e.stopPropagation();
-      onEditImage(heroImage);
+      onEditImage('hero-background');
     }
   };
+
+  // Get the current background image (saved or default)
+  const currentBackgroundImage = savedImages?.['hero-background'] || heroImage;
 
   return (
     <section 
       id="hero" 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(rgba(34, 34, 34, 0.7), rgba(34, 34, 34, 0.7)), url(${heroImage})`,
+        backgroundImage: `linear-gradient(rgba(34, 34, 34, 0.6), rgba(34, 34, 34, 0.6)), url(${currentBackgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -71,7 +76,7 @@ export default function HeroSection({ isAdminMode, onEditText, onEditImage }: He
             data-editable="true"
             data-content-id="hero-title"
           >
-            Arshma Batool
+            {savedContent?.['hero-title'] || 'Arshma Batool'}
           </motion.h1>
           
           <motion.h2
@@ -83,7 +88,7 @@ export default function HeroSection({ isAdminMode, onEditText, onEditImage }: He
             data-editable="true"
             data-content-id="hero-subtitle"
           >
-            I am Fashion Designer
+            {savedContent?.['hero-subtitle'] || 'I am Fashion Designer'}
           </motion.h2>
         </motion.div>
 
@@ -99,9 +104,7 @@ export default function HeroSection({ isAdminMode, onEditText, onEditImage }: He
           data-editable="true"
           data-content-id="hero-description"
         >
-          I am a visionary fashion designer creating innovative designs that blend contemporary style with timeless elegance. 
-          My work spans from haute couture to ready-to-wear collections, each piece telling a unique story through fabric, 
-          color, and form. Welcome to my creative universe.
+          {savedContent?.['hero-description'] || 'I am a visionary fashion designer creating innovative designs that blend contemporary style with timeless elegance. My work spans from haute couture to ready-to-wear collections, each piece telling a unique story through fabric, color, and form. Welcome to my creative universe.'}
         </motion.p>
 
         <motion.div

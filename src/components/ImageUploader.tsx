@@ -4,23 +4,18 @@ import { Upload, X } from 'lucide-react';
 
 interface ImageUploaderProps {
   currentImage: string;
-  onImageChange: (imageUrl: string) => void;
+  onImageUpload: (file: File) => void;
   onClose: () => void;
 }
 
-export default function ImageUploader({ currentImage, onImageChange, onClose }: ImageUploaderProps) {
+export default function ImageUploader({ currentImage, onImageUpload, onClose }: ImageUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        onImageChange(result);
-        onClose();
-      };
-      reader.readAsDataURL(file);
+      onImageUpload(file);
+      onClose();
     }
   };
 
@@ -29,8 +24,18 @@ export default function ImageUploader({ currentImage, onImageChange, onClose }: 
     const formData = new FormData(event.currentTarget);
     const url = formData.get('imageUrl') as string;
     if (url) {
-      onImageChange(url);
-      onClose();
+      // Convert URL to blob and then to File for consistency
+      fetch(url)
+        .then(res => res.blob())
+        .then(blob => {
+          const file = new File([blob], 'image.jpg', { type: blob.type });
+          onImageUpload(file);
+          onClose();
+        })
+        .catch(() => {
+          // Fallback for CORS issues - just close
+          onClose();
+        });
     }
   };
 
